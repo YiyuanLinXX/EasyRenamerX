@@ -47,6 +47,8 @@ python EasyRenamerX.py --root_dir 'path/to/your/directory'
 
 
 
+
+
 ## Contributing
 
 Contributions to EasyRenamerX are welcome. Please feel free to fork the repository, make changes, and submit pull requests. If you encounter any issues or have suggestions for improvements, please open an issue in the repository.
