@@ -4,28 +4,24 @@ import shutil
 import argparse
 
 def title_except_prepositions(name, prepositions):
-    # Split the name into words, using underscore as delimiter while keeping it
-    words = re.split('(_)', name)
+    # Using underscore as delimiter, keeping it for split but ensuring it's not part of the word checks
+    words = re.split('(_+)', name)  # Adjusted to split on underscore(s), keeping them for re-joining
     new_words = []
     for word in words:
-        # Keep prepositions as is, capitalize other words
-        if word.lower() in prepositions:
-            new_words.append(word)
-        else:
+        # Check if the word is fully lowercase and not a preposition; if so, capitalize. Otherwise, leave as is.
+        if word.lower() not in prepositions and word.islower():
             new_words.append(word.capitalize())
+        else:
+            new_words.append(word)
     return ''.join(new_words)
 
 def rename_files_and_folders(root_dir):
-    # Define a set of common prepositions
     prepositions = {'in', 'on', 'at', 'since', 'for', 'ago', 'before', 'to', 'past', 'till', 'until', 'by', 'under', 'below', 'over', 'above', 'across', 'through', 'into', 'towards', 'onto', 'from', 'of', 'off', 'about'}
     
-    # Lists to store paths for renaming later
     files_to_rename = []
     dirs_to_rename = []
 
-    # First, collect all file and directory paths
     for dirpath, dirnames, filenames in os.walk(root_dir, topdown=False):
-        # Collect files for renaming
         for filename in filenames:
             original_file_path = os.path.join(dirpath, filename)
             new_name = filename.replace(' ', '_')
@@ -33,19 +29,16 @@ def rename_files_and_folders(root_dir):
             new_file_path = os.path.join(dirpath, new_name)
             files_to_rename.append((original_file_path, new_file_path))
         
-        # Collect directories for renaming
-        if dirpath != root_dir:  # Skip the root directory itself
+        if dirpath != root_dir:
             new_dirname = os.path.basename(dirpath).replace(' ', '_')
             new_dirname = title_except_prepositions(new_dirname, prepositions)
             new_dirpath = os.path.join(os.path.dirname(dirpath), new_dirname)
             dirs_to_rename.append((dirpath, new_dirpath))
 
-    # Rename files
     for original_path, new_path in files_to_rename:
         shutil.move(original_path, new_path)
         print(f"Renamed file: {original_path} -> {new_path}")
 
-    # Rename directories from bottom to top
     for original_path, new_path in reversed(dirs_to_rename):
         shutil.move(original_path, new_path)
         print(f"Renamed folder: {original_path} -> {new_path}")
